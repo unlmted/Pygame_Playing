@@ -15,35 +15,36 @@ HERO = pygame.image.load(
         os.path.join('ASSETS', 'HERO.jpg'))
 HERO_RESIZE = pygame.transform.rotate(pygame.transform.scale(HERO, (55, 55)), 115)
 VEL = 5 # Velocity (how much characters move)
+BORDER = pygame.Rect((WIDTH/2)-5, 0, 10, HEIGHT)
 
 def hero_movement(keys_pressed, hero):
-    if keys_pressed[pygame.K_a]:  # left
+    if keys_pressed[pygame.K_a] and (hero.x - VEL) > 0:  # left
         hero.x -= VEL
-    if keys_pressed[pygame.K_d]:  # right
+    if keys_pressed[pygame.K_d] and (hero.x + VEL + hero.width) < (BORDER.x):  # right
         hero.x += VEL
-    if keys_pressed[pygame.K_w]:
+    if keys_pressed[pygame.K_w] and (hero.y - VEL) > 0:
         hero.y -= VEL
-    if keys_pressed[pygame.K_s]:
+    if keys_pressed[pygame.K_s] and (hero.y + VEL + hero.width) < HEIGHT :
         hero.y += VEL
 
 def alien_movement(keys_pressed, alien):
-    if keys_pressed[pygame.K_UP]:
+    if keys_pressed[pygame.K_UP] and (alien.y - VEL) > 0 :
         alien.y -= VEL
-    if keys_pressed[pygame.K_DOWN]:
+    if keys_pressed[pygame.K_DOWN] and (alien.y + VEL + alien.width) < HEIGHT:
         alien.y += VEL
-    if keys_pressed[pygame.K_LEFT]:
+    if keys_pressed[pygame.K_LEFT] and (alien.x - VEL) > (BORDER.x):
         alien.x -= VEL
-    if keys_pressed[pygame.K_RIGHT]:
+    if keys_pressed[pygame.K_RIGHT] and (alien.x + VEL + alien.width) < WIDTH:
         alien.x += VEL
 
 def draw_window(hero, alien):
     WIN.fill(HOT_PINK)
+    pygame.draw.rect(WIN, WHITE, BORDER)
     WIN.blit(ALIEN_RESIZE, (alien.x, alien.y))
     WIN.blit(HERO_RESIZE, (hero.x, hero.y))
     pygame.display.update()
-
 def main():
-    hero = pygame.Rect(100, 300, 55, 55)
+    hero = pygame.Rect(10, 30, 55, 55)
     alien = pygame.Rect(500, 300, 55, 55)
     clock = pygame.time.Clock() # Clock object
     run = True
