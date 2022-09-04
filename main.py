@@ -1,5 +1,6 @@
 import pygame
 import os
+from sys import platform
 
 # CONSTANTS
 WIDTH, HEIGHT = 900, 500
@@ -23,6 +24,11 @@ MAX_BULLETS = 3
 HERO_HIT = pygame.USEREVENT + 1 # User event 1
 ALIEN_HIT = pygame.USEREVENT + 2 # User event 2
 
+#determine OS for key mapping
+if platform == "darwin":
+    fire_button_right = pygame.K_m
+else:
+    fire_button_right = pygame.K_RCTRL
 def hero_movement(keys_pressed, hero):
     if keys_pressed[pygame.K_a] and (hero.x - VEL) > 0:  # left
         hero.x -= VEL
@@ -77,7 +83,7 @@ def main():
     hero_bullets = [] 
     clock = pygame.time.Clock() # Clock object
     run = True
-
+    print(fire_button_right)
     while run:
         clock.tick(FPS) # Ensure we never go over this capped frame rate for performance
         # Gets a list of all different events
@@ -86,11 +92,13 @@ def main():
                 if event.key == pygame.K_LCTRL and len(alien_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect((alien.x + alien.width), (alien.y + alien.height//2 - 2), 10, 5)
                     alien_bullets.append(bullet)
-                if event.key == pygame.K_RCTRL and len(hero_bullets) < MAX_BULLETS:
+                if event.key == fire_button_right and len(hero_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect(hero.x, (hero.y + hero.height//2 - 2), 10, 5)
                     hero_bullets.append(bullet)
             if event.type == pygame.QUIT:
                 run = False
+            if event.type == HERO_HIT:
+                print("Hero hit")
         keys_pressed = pygame.key.get_pressed() # tells which keys are being pressed down
         hero_movement(keys_pressed, hero)
         
@@ -99,7 +107,7 @@ def main():
         handle_bullets(hero_bullets, alien_bullets, hero, alien)
 
         draw_window(hero, alien, alien_bullets, hero_bullets) # Fill window color
-        print(alien_bullets, hero_bullets)
+        # print(alien_bullets, hero_bullets)
     quit()
 
 if __name__ == '__main__':
