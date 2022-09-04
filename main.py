@@ -60,6 +60,7 @@ def draw_window(hero, alien, hero_bullets, alien_bullets):
 def handle_bullets(hero_bullets, alien_bullets, hero, alien):
     for bullet in hero_bullets:
         bullet.x += BULLETS_VELOCITY
+        if alien.colliderect(bullet):
             pygame.event.post(pygame.event.Event(ALIEN_HIT))
             hero_bullets.remove(bullet)
     for bullet in alien_bullets:
