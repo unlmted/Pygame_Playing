@@ -1,6 +1,8 @@
+from re import A
 import pygame
 import os
 from sys import platform
+pygame.font.init()
 
 # CONSTANTS
 WIDTH, HEIGHT = 900, 500
@@ -25,6 +27,10 @@ HERO_HIT = pygame.USEREVENT + 1 # User event 1
 ALIEN_HIT = pygame.USEREVENT + 2 # User event 2
 SPACE = pygame.transform.scale(pygame.image.load(
     os.path.join('ASSETS', 'space.png')), (WIDTH, HEIGHT))
+
+
+HEALTH_FONT = pygame.font.SysFont('comicssans', 40) # defining font we want to use
+WINNER_FONT = pygame.font.SysFont('comicsans', 100)
 
 #determine OS for key mapping
 if platform == "darwin":
@@ -52,11 +58,17 @@ def alien_movement(keys_pressed, alien):
     if keys_pressed[pygame.K_RIGHT] and (alien.x + VEL + alien.width) < WIDTH:
         alien.x += VEL
 
-def draw_window(hero, alien, hero_bullets, alien_bullets):
+def draw_window(hero, alien, hero_bullets, alien_bullets, hero_alive, alien_alive, hero_health, alien_health):
     WIN.blit(SPACE, (0,0))
     pygame.draw.rect(WIN, WHITE, BORDER)
-    WIN.blit(ALIEN_RESIZE, (alien.x, alien.y))
-    WIN.blit(HERO_RESIZE, (hero.x, hero.y))
+    hero_health_text = HEALTH_FONT.render("Health: " + str(hero_health), 1, WHITE) # Use this font to render some text
+    alien_health_text = HEALTH_FONT.render("Health: " + str(alien_health), 1, WHITE)
+    WIN.blit(alien_health_text, (WIDTH - alien_health_text.get_width() - 20, 10))
+    WIN.blit(hero_health_text, (10, 10))
+    if hero_alive:
+        WIN.blit(HERO_RESIZE, (hero.x, hero.y))
+    if alien_alive:
+        WIN.blit(ALIEN_RESIZE, (alien.x, alien.y)) 
     for bullet in hero_bullets:
         pygame.draw.rect(WIN, RED, bullet)
 
@@ -65,21 +77,29 @@ def draw_window(hero, alien, hero_bullets, alien_bullets):
 
     pygame.display.update()
 
-def handle_bullets(hero_bullets, alien_bullets, hero, alien):
-    for bullet in hero_bullets:
-        bullet.x += BULLETS_VELOCITY
-        if alien.colliderect(bullet):
-            pygame.event.post(pygame.event.Event(ALIEN_HIT))
-            hero_bullets.remove(bullet)
-        elif bullet.x > WIDTH:
-            hero_bullets.remove(bullet)
-    for bullet in alien_bullets:
-        bullet.x -= BULLETS_VELOCITY
-        if hero.colliderect(bullet):
-            pygame.event.post(pygame.event.Event(HERO_HIT))
-            alien_bullets.remove(bullet)
-        elif bullet.x < 0:
-            alien_bullets.remove(bullet)
+def handle_bullets(hero_bullets, alien_bullets, hero, alien, hero_alive, alien_alive):
+    if hero_alive:
+        for bullet in hero_bullets:
+            bullet.x += BULLETS_VELOCITY
+            if alien.colliderect(bullet):
+                pygame.event.post(pygame.event.Event(ALIEN_HIT))
+                hero_bullets.remove(bullet)
+            elif bullet.x > WIDTH:
+                hero_bullets.remove(bullet)
+    if alien_alive:
+        for bullet in alien_bullets:
+            bullet.x -= BULLETS_VELOCITY
+            if hero.colliderect(bullet):
+                pygame.event.post(pygame.event.Event(HERO_HIT))
+                alien_bullets.remove(bullet)
+            elif bullet.x < 0:
+                alien_bullets.remove(bullet)
+
+def draw_winner(winner_text):
+    winner = WINNER_FONT.render(winner_text, 1, WHITE)
+    WIN.blit(winner,(WIDTH//2 - winner.get_width()//2, HEIGHT//2 - winner.get_height()//2))
+    pygame.display.update()
+    pygame.time.delay(5000) # delay by 5 seconds
 
 def main():
     hero = pygame.Rect(10, 30, 55, 55)
@@ -89,6 +109,8 @@ def main():
     hero_health = 3
     alien_health = 3
     clock = pygame.time.Clock() # Clock object
+    alien_alive = True
+    hero_alive = True
     run = True
    
     while run:
@@ -105,21 +127,30 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == HERO_HIT:
-                hero_health -= 1
-                print("Hero hit")
+                if hero_health > 0:
+                    hero_health -= 1
+                    print("Hero hit")
             if event.type == ALIEN_HIT:
-                alien_health -= 1
-                print("Alien hit")
+                if alien_health > 0:
+                    alien_health -= 1
+                    print("Alien hit")
 
+        winner_text = ""
         if hero_health == 0:
-            print("Hero dead")
+            hero_alive = False
+            winner_text = "Alien Wins!"
         if alien_health == 0:
-            print("Alien dead")
+            alien_alive = False
+            winner_text = "Hero Wins!"
+        if winner_text != "":
+            draw_winner(winner_text)
+            main()
+
         keys_pressed = pygame.key.get_pressed() # tells which keys are being pressed down
         hero_movement(keys_pressed, hero)
         alien_movement(keys_pressed, alien)
-        handle_bullets(hero_bullets, alien_bullets, hero, alien)
-        draw_window(hero, alien, alien_bullets, hero_bullets) # Fill window color
+        handle_bullets(hero_bullets, alien_bullets, hero, alien, hero_alive, alien_alive)
+        draw_window(hero, alien, alien_bullets, hero_bullets, hero_alive, alien_alive, hero_health, alien_health) # Fill window color
         
     quit()
 
