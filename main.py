@@ -3,6 +3,7 @@ import pygame
 import os
 from sys import platform
 pygame.font.init()
+pygame.mixer.init() # Starts the sound aspect of pygame
 
 # CONSTANTS
 WIDTH, HEIGHT = 900, 500
@@ -27,8 +28,10 @@ HERO_HIT = pygame.USEREVENT + 1 # User event 1
 ALIEN_HIT = pygame.USEREVENT + 2 # User event 2
 SPACE = pygame.transform.scale(pygame.image.load(
     os.path.join('ASSETS', 'space.png')), (WIDTH, HEIGHT))
-
-
+BULLET_HIT_SOUND = pygame.mixer.Sound(os.path.join('ASSETS', 'HIT.mp3'))
+BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join('ASSETS', 'GUN_SHOT.mp3'))
+WINNER_SOUND = pygame.mixer.Sound(os.path.join('ASSETS', 'WINNER.mp3'))
+AMBIENT_SOUND = pygame.mixer.Sound(os.path.join('ASSETS', 'AMBIENT.mp3'))
 HEALTH_FONT = pygame.font.SysFont('comicssans', 40) # defining font we want to use
 WINNER_FONT = pygame.font.SysFont('comicsans', 100)
 
@@ -99,6 +102,7 @@ def draw_winner(winner_text):
     winner = WINNER_FONT.render(winner_text, 1, WHITE)
     WIN.blit(winner,(WIDTH//2 - winner.get_width()//2, HEIGHT//2 - winner.get_height()//2))
     pygame.display.update()
+    WINNER_SOUND.play()
     pygame.time.delay(5000) # delay by 5 seconds
 
 def main():
@@ -112,7 +116,7 @@ def main():
     alien_alive = True
     hero_alive = True
     run = True
-   
+    AMBIENT_SOUND.play()
     while run:
         clock.tick(FPS) # Ensure we never go over this capped frame rate for performance
         # Gets a list of all different events
@@ -121,19 +125,23 @@ def main():
                 if event.key == fire_button_right and len(alien_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect((alien.x + alien.width), (alien.y + alien.height//2 - 2), 10, 5)
                     alien_bullets.append(bullet)
+                    BULLET_FIRE_SOUND.play()
                 if event.key == pygame.K_LCTRL and len(hero_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect(hero.x, (hero.y + hero.height//2 - 2), 10, 5)
                     hero_bullets.append(bullet)
+                    BULLET_FIRE_SOUND.play()
             if event.type == pygame.QUIT:
                 run = False
             if event.type == HERO_HIT:
                 if hero_health > 0:
                     hero_health -= 1
                     print("Hero hit")
+                    BULLET_HIT_SOUND.play()
             if event.type == ALIEN_HIT:
                 if alien_health > 0:
                     alien_health -= 1
                     print("Alien hit")
+                    BULLET_HIT_SOUND.play()
 
         winner_text = ""
         if hero_health == 0:
