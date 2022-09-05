@@ -23,7 +23,9 @@ BULLETS_VELOCITY = 7 # projectile speed
 MAX_BULLETS = 30
 HERO_HIT = pygame.USEREVENT + 1 # User event 1
 ALIEN_HIT = pygame.USEREVENT + 2 # User event 2
-
+SPACE = pygame.image.load(
+    os.path.join('ASSETS', 'space.png')
+)
 #determine OS for key mapping
 if platform == "darwin":
     fire_button_right = pygame.K_m
@@ -52,6 +54,7 @@ def alien_movement(keys_pressed, alien):
 
 def draw_window(hero, alien, hero_bullets, alien_bullets):
     WIN.fill(HOT_PINK)
+    WIN.blit(SPACE, (0,0))
     pygame.draw.rect(WIN, WHITE, BORDER)
     WIN.blit(ALIEN_RESIZE, (alien.x, alien.y))
     WIN.blit(HERO_RESIZE, (hero.x, hero.y))
@@ -70,14 +73,14 @@ def handle_bullets(hero_bullets, alien_bullets, hero, alien):
         if alien.colliderect(bullet):
             pygame.event.post(pygame.event.Event(ALIEN_HIT))
             hero_bullets.remove(bullet)
-        if bullet.x > WIDTH:
+        elif bullet.x > WIDTH:
             hero_bullets.remove(bullet)
     for bullet in alien_bullets:
         bullet.x -= BULLETS_VELOCITY
         if hero.colliderect(bullet):
             pygame.event.post(pygame.event.Event(HERO_HIT))
             alien_bullets.remove(bullet)
-        if bullet.x < 0:
+        elif bullet.x < 0:
             alien_bullets.remove(bullet)
 
 def main():
@@ -109,14 +112,10 @@ def main():
 
         keys_pressed = pygame.key.get_pressed() # tells which keys are being pressed down
         hero_movement(keys_pressed, hero)
-        
         alien_movement(keys_pressed, alien)
-
         handle_bullets(hero_bullets, alien_bullets, hero, alien)
-
         draw_window(hero, alien, alien_bullets, hero_bullets) # Fill window color
 
-        print(len(hero_bullets), len(alien_bullets))
     quit()
 
 if __name__ == '__main__':
