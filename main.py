@@ -33,7 +33,7 @@ BULLET_FIRE_SOUND = pygame.mixer.Sound(os.path.join('ASSETS', 'GUN_SHOT.mp3'))
 WINNER_SOUND = pygame.mixer.Sound(os.path.join('ASSETS', 'WINNER.mp3'))
 AMBIENT_SOUND = pygame.mixer.Sound(os.path.join('ASSETS', 'AMBIENT.mp3'))
 HEALTH_FONT = pygame.font.SysFont('comicssans', 40) # defining font we want to use
-WINNER_FONT = pygame.font.SysFont('comicsans', 100)
+WINNER_FONT = pygame.font.SysFont('comicssans', 100)
 
 #determine OS for key mapping
 if platform == "darwin":
@@ -63,7 +63,7 @@ def alien_movement(keys_pressed, alien):
 
 def draw_window(hero, alien, hero_bullets, alien_bullets, hero_alive, alien_alive, hero_health, alien_health):
     WIN.blit(SPACE, (0,0))
-    pygame.draw.rect(WIN, WHITE, BORDER)
+    pygame.draw.rect(WIN, HOT_PINK, BORDER)
     hero_health_text = HEALTH_FONT.render("Health: " + str(hero_health), 1, WHITE) # Use this font to render some text
     alien_health_text = HEALTH_FONT.render("Health: " + str(alien_health), 1, WHITE)
     WIN.blit(alien_health_text, (WIDTH - alien_health_text.get_width() - 20, 10))
