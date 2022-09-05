@@ -23,9 +23,9 @@ BULLETS_VELOCITY = 7 # projectile speed
 MAX_BULLETS = 30
 HERO_HIT = pygame.USEREVENT + 1 # User event 1
 ALIEN_HIT = pygame.USEREVENT + 2 # User event 2
-SPACE = pygame.image.load(
-    os.path.join('ASSETS', 'space.png')
-)
+SPACE = pygame.transform.scale(pygame.image.load(
+    os.path.join('ASSETS', 'space.png')), (WIDTH, HEIGHT))
+
 #determine OS for key mapping
 if platform == "darwin":
     fire_button_right = pygame.K_m
@@ -53,12 +53,10 @@ def alien_movement(keys_pressed, alien):
         alien.x += VEL
 
 def draw_window(hero, alien, hero_bullets, alien_bullets):
-    WIN.fill(HOT_PINK)
     WIN.blit(SPACE, (0,0))
     pygame.draw.rect(WIN, WHITE, BORDER)
     WIN.blit(ALIEN_RESIZE, (alien.x, alien.y))
     WIN.blit(HERO_RESIZE, (hero.x, hero.y))
-
     for bullet in hero_bullets:
         pygame.draw.rect(WIN, RED, bullet)
 
@@ -86,9 +84,10 @@ def handle_bullets(hero_bullets, alien_bullets, hero, alien):
 def main():
     hero = pygame.Rect(10, 30, 55, 55)
     alien = pygame.Rect(500, 300, 55, 55)
-
     alien_bullets = [] # empty list for the bullets
     hero_bullets = [] 
+    hero_health = 3
+    alien_health = 3
     clock = pygame.time.Clock() # Clock object
     run = True
    
@@ -106,16 +105,22 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
             if event.type == HERO_HIT:
+                hero_health -= 1
                 print("Hero hit")
             if event.type == ALIEN_HIT:
+                alien_health -= 1
                 print("Alien hit")
 
+        if hero_health == 0:
+            print("Hero dead")
+        if alien_health == 0:
+            print("Alien dead")
         keys_pressed = pygame.key.get_pressed() # tells which keys are being pressed down
         hero_movement(keys_pressed, hero)
         alien_movement(keys_pressed, alien)
         handle_bullets(hero_bullets, alien_bullets, hero, alien)
         draw_window(hero, alien, alien_bullets, hero_bullets) # Fill window color
-
+        
     quit()
 
 if __name__ == '__main__':
