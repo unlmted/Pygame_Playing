@@ -70,10 +70,14 @@ def handle_bullets(hero_bullets, alien_bullets, hero, alien):
         if alien.colliderect(bullet):
             pygame.event.post(pygame.event.Event(ALIEN_HIT))
             hero_bullets.remove(bullet)
+        if bullet.x > WIDTH:
+            hero_bullets.remove(bullet)
     for bullet in alien_bullets:
         bullet.x -= BULLETS_VELOCITY
         if hero.colliderect(bullet):
             pygame.event.post(pygame.event.Event(HERO_HIT))
+            alien_bullets.remove(bullet)
+        if bullet.x < 0:
             alien_bullets.remove(bullet)
 
 def main():
@@ -84,7 +88,7 @@ def main():
     hero_bullets = [] 
     clock = pygame.time.Clock() # Clock object
     run = True
-    print(fire_button_right)
+   
     while run:
         clock.tick(FPS) # Ensure we never go over this capped frame rate for performance
         # Gets a list of all different events
@@ -100,6 +104,9 @@ def main():
                 run = False
             if event.type == HERO_HIT:
                 print("Hero hit")
+            if event.type == ALIEN_HIT:
+                print("Alien hit")
+
         keys_pressed = pygame.key.get_pressed() # tells which keys are being pressed down
         hero_movement(keys_pressed, hero)
         
@@ -108,7 +115,8 @@ def main():
         handle_bullets(hero_bullets, alien_bullets, hero, alien)
 
         draw_window(hero, alien, alien_bullets, hero_bullets) # Fill window color
-        # print(alien_bullets, hero_bullets)
+
+        print(len(hero_bullets), len(alien_bullets))
     quit()
 
 if __name__ == '__main__':
