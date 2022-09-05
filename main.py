@@ -23,7 +23,7 @@ HERO_RESIZE = pygame.transform.rotate(pygame.transform.scale(HERO, (55, 55)), 90
 VEL = 5 # Velocity (how much characters move)
 BORDER = pygame.Rect((WIDTH//2)-5, 0, 10, HEIGHT)
 BULLETS_VELOCITY = 7 # projectile speed
-MAX_BULLETS = 30
+MAX_BULLETS = 3
 HERO_HIT = pygame.USEREVENT + 1 # User event 1
 ALIEN_HIT = pygame.USEREVENT + 2 # User event 2
 SPACE = pygame.transform.scale(pygame.image.load(
@@ -126,7 +126,7 @@ def main():
                     bullet = pygame.Rect((alien.x + alien.width), (alien.y + alien.height//2 - 2), 10, 5)
                     alien_bullets.append(bullet)
                     BULLET_FIRE_SOUND.play()
-                if event.key == pygame.K_LCTRL and len(hero_bullets) < MAX_BULLETS:
+                if event.key == pygame.K_z and len(hero_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect(hero.x, (hero.y + hero.height//2 - 2), 10, 5)
                     hero_bullets.append(bullet)
                     BULLET_FIRE_SOUND.play()
