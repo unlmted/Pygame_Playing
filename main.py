@@ -13,14 +13,14 @@ YELLOW = (255, 255, 0)
 FPS = 60 # how many frames per second game updates at
 ALIEN = pygame.image.load(
         os.path.join('ASSETS', 'ALIEN.png'))
-ALIEN_RESIZE = pygame.transform.scale(ALIEN, (55, 55))
+ALIEN_RESIZE = pygame.transform.rotate(pygame.transform.scale(ALIEN, (55, 55)), 270)
 HERO = pygame.image.load(
         os.path.join('ASSETS', 'HERO.png'))
-HERO_RESIZE = pygame.transform.rotate(pygame.transform.scale(HERO, (55, 55)), 115)
+HERO_RESIZE = pygame.transform.rotate(pygame.transform.scale(HERO, (55, 55)), 90)
 VEL = 5 # Velocity (how much characters move)
 BORDER = pygame.Rect((WIDTH//2)-5, 0, 10, HEIGHT)
 BULLETS_VELOCITY = 7 # projectile speed
-MAX_BULLETS = 3
+MAX_BULLETS = 30
 HERO_HIT = pygame.USEREVENT + 1 # User event 1
 ALIEN_HIT = pygame.USEREVENT + 2 # User event 2
 
@@ -29,6 +29,7 @@ if platform == "darwin":
     fire_button_right = pygame.K_m
 else:
     fire_button_right = pygame.K_RCTRL
+
 def hero_movement(keys_pressed, hero):
     if keys_pressed[pygame.K_a] and (hero.x - VEL) > 0:  # left
         hero.x -= VEL
@@ -89,10 +90,10 @@ def main():
         # Gets a list of all different events
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LCTRL and len(alien_bullets) < MAX_BULLETS:
+                if event.key == fire_button_right and len(alien_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect((alien.x + alien.width), (alien.y + alien.height//2 - 2), 10, 5)
                     alien_bullets.append(bullet)
-                if event.key == fire_button_right and len(hero_bullets) < MAX_BULLETS:
+                if event.key == pygame.K_LCTRL and len(hero_bullets) < MAX_BULLETS:
                     bullet = pygame.Rect(hero.x, (hero.y + hero.height//2 - 2), 10, 5)
                     hero_bullets.append(bullet)
             if event.type == pygame.QUIT:
